@@ -23,8 +23,8 @@
 		zephyr,sram = &tcmu_sys;
 		zephyr,console = &uart4;
 		zephyr,shell-uart = &uart4;
-		zephyr,ipc_shm = &ddr0_shared;
-		zephyr,ipc = &mailbox0;
+/*		zephyr,ipc_shm = &ddr0_shared;
+		zephyr,ipc = &mailbox0; */
 	};
 
 	reserved-memory {

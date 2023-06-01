@@ -8,6 +8,8 @@ manifest:
   remotes:
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
+    - name: nxp-mcuxpresso
+      url-base: https://github.com/nxp-mcuxpresso
 
   projects:
     - name: zephyr
@@ -23,3 +25,12 @@ manifest:
           - open-amp
           - hal_nordic
           - hal_stm32
+    - name: rpmsg-lite
+      remote: nxp-mcuxpresso
+      revision: master
+      path: rpmsg-lite
+    - name: mcux-sdk-examples
+      remote: nxp-mcuxpresso
+      revision: main
+      path: mcux-sdk-examples
+
