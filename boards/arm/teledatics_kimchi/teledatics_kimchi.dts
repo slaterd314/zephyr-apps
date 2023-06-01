@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2023, Teledatics, Inc
+ *
+ * SPDX-License-Identifier: All rights reserved
+ */
+
+/dts-v1/;
+
+#include <nxp/nxp_imx8mm_m4.dtsi>
+
+#include "teledatics_kimchi-pinctrl.dtsi"
+
+/ {
+	model = "Teledatics Kimchi Halo Board";
+	compatible = "nxp,mimx8mm_evk";
+
+	aliases {
+		uart-4 = &uart4;
+	};
+
+	chosen {
+		zephyr,flash = &tcml_code;
+		zephyr,sram = &tcmu_sys;
+		zephyr,console = &uart4;
+		zephyr,shell-uart = &uart4;
+		zephyr,ipc_shm = &ddr0_shared;
+		zephyr,ipc = &mailbox0;
+	};
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		ddr0_shared: memory@b8400000 {
+			/* DDR RAM allocated to shared memory */
+			reg = <0xb8400000 0x100000>;
+		};
+	};
+
+};
+
+&uart4 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart4_default>;
+	pinctrl-names = "default";
+};
+
+&mailbox0 {
+	status = "okay";
+	compatible = "nxp,imx-mu-rev2";
+};

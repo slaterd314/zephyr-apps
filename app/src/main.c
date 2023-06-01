@@ -12,6 +12,15 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 
 int main(void)
 {
+	printk("Zephyr Example Application %s\n", APP_VERSION_STRING);
+	for(int i=0; i<10; i++)
+	{
+		k_sleep(K_MSEC(100));
+		printk("%d: Zephyr Example Application %s\n", i, APP_VERSION_STRING);
+		printk("%d: Hello World! %s\n", i, CONFIG_ARCH);
+	}
+	return 0;
+#if 0	
 	int ret;
 	const struct device *sensor;
 
@@ -44,5 +53,6 @@ int main(void)
 	}
 
 	return 0;
+#endif
 }
 
