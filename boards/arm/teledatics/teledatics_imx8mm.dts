@@ -8,11 +8,11 @@
 
 #include <nxp/nxp_imx8mm_m4.dtsi>
 
-#include "teledatics_kimchi-pinctrl.dtsi"
+#include "teledatics_imx8mm-pinctrl.dtsi"
 
 / {
-	model = "Teledatics Kimchi Halo Board";
-	compatible = "nxp,mimx8mm_evk";
+	model = "Teledatics imx8mm Halo Board";
+	compatible = "teledatics,teledatics_imx8mm";
 
 	aliases {
 		uart-4 = &uart4;

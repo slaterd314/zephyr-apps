@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-identifier: teledatics_kimchi
-name: Teledatics Kimchi Halo Board
+identifier: teledatics_imx8mm
+name: Teledatics imx8mm Halo Board
 type: mcu
 arch: arm
 ram: 32

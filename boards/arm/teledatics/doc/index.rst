@@ -1,4 +1,4 @@
-.. _teledatics_kimchi:
+.. _teledatics_imx8mm:
 
 NXP MIMX8MM EVK
 ###############
