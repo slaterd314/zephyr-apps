@@ -5,7 +5,6 @@
 # as the module CMake entry point (see zephyr/module.yml).
 
 zephyr_include_directories(include)
-zephyr_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/rpmsg-lite/lib/include)
 
 add_subdirectory(drivers)
 add_subdirectory(lib)

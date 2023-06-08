@@ -16,7 +16,7 @@
 					       RDC_DOMAIN_PERM_RW)|\
 			       RDC_DOMAIN_PERM(M4_DOMAIN_ID,\
 					       RDC_DOMAIN_PERM_RW))>;
-			status = "enabled";
+			status = "okay";
 		};        
     };
 };

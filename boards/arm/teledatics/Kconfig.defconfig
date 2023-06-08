@@ -7,7 +7,7 @@
 if BOARD_TELEDATICS_KIMCHI
 
 config BOARD
-	default "teledatics_kimchi"
+	default "teledatics_imx8mm"
 
 if !XIP
 config FLASH_SIZE

@@ -23,8 +23,8 @@
 		zephyr,sram = &tcmu_sys;
 		zephyr,console = &uart4;
 		zephyr,shell-uart = &uart4;
-/*		zephyr,ipc_shm = &ddr0_shared;
-		zephyr,ipc = &mailbox0; */
+		zephyr,ipc_shm = &ddr0_shared;
+		zephyr,ipc = &mailbox0;
 	};
 
 	reserved-memory {
@@ -35,6 +35,11 @@
 		ddr0_shared: memory@b8400000 {
 			/* DDR RAM allocated to shared memory */
 			reg = <0xb8400000 0x100000>;
+		};
+
+		debug_buffer: memory@80000000 {
+			/* DDR RAM allocated to debug output */
+			reg = <0x80000000 0x1000000>;			
 		};
 	};
 
@@ -50,4 +55,9 @@
 &mailbox0 {
 	status = "okay";
 	compatible = "nxp,imx-mu-rev2";
+};
+
+&debug_buffer {
+	status = "okay";
+	compatible = "tdx,memory-debug";
 };
