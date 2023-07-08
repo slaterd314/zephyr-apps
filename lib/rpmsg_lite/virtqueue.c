@@ -374,7 +374,7 @@ void *virtqueue_get_available_buffer(struct virtqueue *vq, uint16_t *avail_idx, 
 #endif
     *len = vq->vq_ring.desc[*avail_idx].len;
 
-    printk("virtqueue_get_available_buffer: buffer=%p, len=%d\r\n", buffer, *len);
+    /* printk("virtqueue_get_available_buffer: buffer=%p, len=%d\r\n", buffer, *len); */
 
     VQUEUE_IDLE(vq, avail_read);
 

@@ -235,9 +235,23 @@ void app_task(void *arg1, void *arg2, void *arg3)
         /* Copy string from RPMsg rx buffer */
         assert(len < sizeof(app_buf));
         memcpy(app_buf, rx_buf, len);
+
+        /* Release held RPMsg rx buffer */
+        result = rpmsg_queue_nocopy_free(my_rpmsg, rx_buf);
+        if (result != 0)
+        {
+			printk("rpmsg_queue_nocopy_free failed.\n");
+            assert(false);
+        }
+		rx_buf = NULL;
+
         app_buf[len] = 0; /* End string by '\0' */
-		
-		if ((len == 2) && (app_buf[0] == 0xd) && (app_buf[1] == 0xa))
+
+		if( (len==1) && ((app_buf[0] == 0xa) || (app_buf[0] == 0xd)) )
+		{
+			printk("\r\n");
+		}
+		else if ((len == 2) && (app_buf[0] == 0xd) && (app_buf[1] == 0xa))
 		{
 			printk("\r\n");
 		}
@@ -256,13 +270,6 @@ void app_task(void *arg1, void *arg2, void *arg3)
         if (result != 0)
         {
 			printk("rpmsg_lite_send_nocopy failed.\n");
-            assert(false);
-        }
-        /* Release held RPMsg rx buffer */
-        result = rpmsg_queue_nocopy_free(my_rpmsg, rx_buf);
-        if (result != 0)
-        {
-			printk("rpmsg_queue_nocopy_free failed.\n");
             assert(false);
         }
     }
