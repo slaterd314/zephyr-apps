@@ -6,5 +6,6 @@
 
 zephyr_include_directories(include)
 
+message("Building app")
 add_subdirectory(drivers)
 add_subdirectory(lib)

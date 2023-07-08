@@ -23,8 +23,11 @@
 		zephyr,sram = &tcmu_sys;
 		zephyr,console = &uart4;
 		zephyr,shell-uart = &uart4;
-		zephyr,ipc_shm = &ddr0_shared;
+		zephyr,ipc_shm = &vdevbuffer;
+		zephyr,vring0_shm = &vdev0vring0;
 		zephyr,ipc = &mailbox0;
+		zephyr,debug_shm = &debug_buffer;
+		zephyr,rsc_table = &rsc_table;
 	};
 
 	reserved-memory {
@@ -32,17 +35,41 @@
 		#size-cells = <1>;
 		ranges;
 
-		ddr0_shared: memory@b8400000 {
-			/* DDR RAM allocated to shared memory */
-			reg = <0xb8400000 0x100000>;
+
+		vdev0vring0: vdev0vring0@b8000000 {
+			reg = <0xb8000000 0x00008000>;
+			no-map;
+		};
+
+		vdev0vring1: vdev0vring1@b8008000 {
+			reg = <0xb8008000 0x00008000>;
+			no-map;
+		};
+
+		rsc_table: rsc-table@b80ff000 {
+			reg = <0xb80ff000 0x00001000>;
+			no-map;
+		};
+
+		vdevbuffer: vdevbuffer@b8400000 {
+			compatible = "shared-dma-pool";
+			reg = <0xb8400000 0x00100000>;
+			no-map;
 		};
 
 		debug_buffer: memory@80000000 {
 			/* DDR RAM allocated to debug output */
-			reg = <0x80000000 0x1000000>;			
+			reg = <0x80000000 0x01000000>;			
 		};
 	};
+};
 
+&ocram_code {
+	reg = <0x00900000 DT_SIZE_K(256)>;
+};
+
+&ocram_sys {
+	reg = <0x20200000 DT_SIZE_K(256)>;
 };
 
 &uart4 {
@@ -59,5 +86,5 @@
 
 &debug_buffer {
 	status = "okay";
-	compatible = "tdx,memory-debug";
+	compatible = "zephyr,memory-debug";
 };

@@ -17,17 +17,40 @@
 #include "board.h"
 #include "rsc_table.h"
 
+
+#define SHM_DEVICE_NAME	"shm"
+
+#if !DT_HAS_CHOSEN(zephyr_ipc_shm)
+#error "Sample requires definition of shared memory for rpmsg"
+#endif
+
+#define VDEV0_VRING_DEVICE_NAME "vring0"
+#if !DT_HAS_CHOSEN(zephyr_vring0_shm)
+#error "Sample requires definition of vring0 for rpmsg"
+#endif
+
 LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 extern void my_debug_out(const char *fmt,...);
-#ifdef printk
+/* #ifdef printk
 #undef printk
 #endif
-#define printk my_debug_out
+#define printk my_debug_out */
+
+
+/* Constants derived from device tree */
+#define SHM_NODE		DT_CHOSEN(zephyr_ipc_shm)
+#define SHM_START_ADDR	DT_REG_ADDR(SHM_NODE)
+#define SHM_SIZE		DT_REG_SIZE(SHM_NODE)
+
+#define VRING0_NODE		DT_CHOSEN(zephyr_vring0_shm)
+#define VRING0_START_ADDR	DT_REG_ADDR(VRING0_NODE)
+#define VRING0_SIZE		DT_REG_SIZE(VRING0_NODE)
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define RPMSG_LITE_SHMEM_BASE         (VDEV0_VRING_BASE)
+// #define RPMSG_LITE_SHMEM_BASE         (VDEV0_VRING_BASE)
+#define RPMSG_LITE_SHMEM_BASE         (VRING0_START_ADDR)
 #define RPMSG_LITE_LINK_ID            (RL_PLATFORM_IMX8MM_M4_USER_LINK_ID)
 #define RPMSG_LITE_NS_ANNOUNCE_STRING "rpmsg-virtual-tty-channel-1"
 #define APP_TASK_STACK_SIZE (256)
@@ -41,7 +64,7 @@ static struct rpmsg_lite_instance *volatile my_rpmsg = NULL;
 static struct rpmsg_lite_endpoint *volatile my_ept = NULL;
 static volatile rpmsg_queue_handle my_queue        = NULL;
 #if defined(RL_USE_STATIC_API) && (RL_USE_STATIC_API == 1)
-static uint8_t queue_storage[256*sizeof(sizeof(rpmsg_queue_rx_cb_data_t))];
+static uint8_t queue_storage[256*sizeof(rpmsg_queue_rx_cb_data_t)];
 #endif
 
 static void dumpVirtqueue(const char *name, struct virtqueue *vq)
@@ -155,8 +178,14 @@ void app_task(void *arg1, void *arg2, void *arg3)
 	}
 
 	dumpVirtqueue("tvq", my_rpmsg->tvq);
-
+/*
+	if(device_get_binding(DT_N_S_soc_S_mailbox_30ab0000_FULL_NAME))
+	{
+		my_rpmsg->link_state = 1;
+	}
+*/
 	printk("rpmsg_lite_wait_for_link_up. linkstate addr: %p\n", &(my_rpmsg->link_state));
+	/* uint32_t test = RL_SUCCESS; */ /* rpmsg_lite_wait_for_link_up(my_rpmsg, RL_BLOCK); */
 	uint32_t test = rpmsg_lite_wait_for_link_up(my_rpmsg, RL_BLOCK);
 	if(test != RL_SUCCESS)
 	{
@@ -201,7 +230,6 @@ void app_task(void *arg1, void *arg2, void *arg3)
 
     for (;;)
     {
-		printk("rpmsg_queue_recv_nocopy.\n");
         /* Get RPMsg rx buffer with message */
         result =
             rpmsg_queue_recv_nocopy(my_rpmsg, my_queue, (uint32_t *)&remote_addr, (char **)&rx_buf, &len, RL_BLOCK);
@@ -215,12 +243,13 @@ void app_task(void *arg1, void *arg2, void *arg3)
         assert(len < sizeof(app_buf));
         memcpy(app_buf, rx_buf, len);
         app_buf[len] = 0; /* End string by '\0' */
-
+		printk("%s", app_buf);
+/*
         if ((len == 2) && (app_buf[0] == 0xd) && (app_buf[1] == 0xa))
             printk("Get New Line From Master Side\r\n");
         else
             printk("Get Message From Master Side : \"%s\" [len : %d]\r\n", app_buf, len);
-
+*/
         /* Get tx buffer from RPMsg */
         tx_buf = rpmsg_lite_alloc_tx_buffer(my_rpmsg, &size, RL_BLOCK);
         assert(tx_buf);
@@ -244,19 +273,22 @@ void app_task(void *arg1, void *arg2, void *arg3)
 
 }
 
-/*
+
 static struct k_thread thread_rp__client_data;
 K_THREAD_STACK_DEFINE(thread_rp__client_stack, APP_TASK_STACK_SIZE);
-*/
+
 #define DT_DRV_COMPAT nxp_imx_mu_rev2
+
+static k_tid_t runRpmsgList();
 
 int main(void)
 {
 
-	my_debug_out("main()\n");
+/*	my_debug_out("main()\n"); */
 
-	k_sleep(K_MSEC(5000));
+	/* k_sleep(K_MSEC(1000));  */
 
+#if 0
 	const struct device *mu = DEVICE_DT_GET(DT_DRV_INST(0));
 	bool isready = device_is_ready(mu);
 
@@ -273,14 +305,23 @@ int main(void)
 		printk("mu->state->init_res: %d\n", mu->state->init_res);
 		printk("mu->state->initialized: %d\n", mu->state->initialized);
 	}
-	
-	k_sleep(K_MSEC(5000));
-	app_task(NULL,NULL,NULL);
-/*
+#endif // 0
+
+	/* k_sleep(K_MSEC(5000));
+	app_task(NULL,NULL,NULL); */
+
 	k_thread_create(&thread_rp__client_data, thread_rp__client_stack, APP_TASK_STACK_SIZE,
 			(k_thread_entry_t)app_task,
 			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
-*/			
+			
 	return 0;
 }
 
+static k_tid_t runRpmsgList()
+{
+
+	return k_thread_create(&thread_rp__client_data, thread_rp__client_stack, APP_TASK_STACK_SIZE,
+			(k_thread_entry_t)app_task,
+			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+
+}

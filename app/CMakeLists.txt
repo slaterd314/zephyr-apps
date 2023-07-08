@@ -9,21 +9,26 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(app LANGUAGES C)
 
+
+set(LOCAL_RPMSG_LITE ${CMAKE_CURRENT_SOURCE_DIR}/../lib/rpmsg_lite)
 set(RPMSG_LITE ${CMAKE_CURRENT_SOURCE_DIR}/../../rpmsg-lite)
 
-set(APP_SOURCES src/main.c src/rsc_table.c 
+include_directories(BEFORE ${LOCAL_RPMSG_LITE})
+
+set(APP_SOURCES src/main.c src/rsc_table.c src/vsprintf.c 
 ${RPMSG_LITE}/lib/common/llist.c 
-${RPMSG_LITE}/lib/rpmsg_lite/rpmsg_lite.c 
+${LOCAL_RPMSG_LITE}/rpmsg_lite.c 
 ${RPMSG_LITE}/lib/rpmsg_lite/rpmsg_ns.c 
-${RPMSG_LITE}/lib/rpmsg_lite/rpmsg_queue.c 
-${RPMSG_LITE}/lib/rpmsg_lite/porting/environment/rpmsg_env_zephyr.c 
-${RPMSG_LITE}/lib/rpmsg_lite/porting/platform/imx8mm_m4/rpmsg_platform.c 
-${RPMSG_LITE}/lib/virtio/virtqueue.c 
+${LOCAL_RPMSG_LITE}/rpmsg_queue.c 
+${LOCAL_RPMSG_LITE}/rpmsg_env_zephyr.c 
+${LOCAL_RPMSG_LITE}/rpmsg_platform.c 
+${LOCAL_RPMSG_LITE}/virtqueue.c 
 )
 
 set(APP_SOURCES ${APP_SOURCES} )
 
 target_include_directories(app 
+PUBLIC ${LOCAL_RPMSG_LITE} 
 PUBLIC ${RPMSG_LITE}/lib/include 
 PUBLIC ${RPMSG_LITE}/lib/include/environment/zephyr 
 PUBLIC ${RPMSG_LITE}/lib/include/platform/imx8mm_m4 

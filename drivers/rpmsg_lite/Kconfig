@@ -1,0 +1,6 @@
+# Copyright (c) 2023 Teledatics, Inc.
+# 
+
+# if RPMSG_LITE_RSC_TABLE
+rsource "rpmsg_lite/Kconfig"
+# endif # RPMSG_LITE_RSC_TABLE

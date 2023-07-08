@@ -1,6 +1,7 @@
 #define DT_DRV_COMPAT zephyr_memory_debug
 #include <zephyr/device.h>
 #include <zephyr/sys/cbprintf.h>
+#include <zephyr/sys/printk.h>
 #include <stdarg.h>
 
 
@@ -29,8 +30,31 @@ static size_t index = 0;
  *   can be used during the earliest stages of boot, before the kernel is
  *   fully initialized.
  */
+
+void my_debug_out_v(const char *fmt, va_list a)
+{
+	char *buffer = debug_buffer + index;
+	va_list args;
+	va_copy(args, a);
+	int count = vsnprintk(buffer, buffer_size - index, fmt, args);
+	va_end(args);
+	index += count;
+	if(index >= buffer_size)
+	{
+		/* if we happen to get exactly to the end of the buffer
+		/ vsnprintk won't add the terminating null character */
+		debug_buffer[index] = '\0';
+		index = 0;
+	}	
+}
+
 void my_debug_out(const char *fmt,...)
 {
+	va_list args;
+	va_start(args, fmt);
+	my_debug_out_v(fmt, args);
+	va_end(args);
+#if 0	
 	char *buffer = debug_buffer + index;
 	va_list args;
 	va_start(args, fmt);
@@ -44,4 +68,5 @@ void my_debug_out(const char *fmt,...)
 		debug_buffer[index] = '\0';
 		index = 0;
 	}
+	#endif
 }

@@ -11,11 +11,32 @@
 /* This file populates resource table for BM remote
  * for use by the Linux Master */
 
+#include <zephyr/kernel.h>
 #include "board.h"
 #include "rsc_table.h"
 #include "rpmsg_lite.h"
 #include "platform/imx8mm_m4/rpmsg_platform.h"
 #include <string.h>
+
+#define RSC_TABLE_NAME "rsc_table"
+#if !DT_HAS_CHOSEN(zephyr_rsc_table)
+#error "Sample requires definition of rsc_table for rpmsg"
+#endif
+
+#define VDEV0_VRING_DEVICE_NAME "vring0"
+#if !DT_HAS_CHOSEN(zephyr_vring0_shm)
+#error "Sample requires definition of vring0 for rpmsg"
+#endif
+
+/* Constants derived from device tree */
+#define RSC_TABLE_NODE		DT_CHOSEN(zephyr_rsc_table)
+#define RSC_TABLE_START_ADDR	DT_REG_ADDR(RSC_TABLE_NODE)
+#define RSC_TABLE_SIZE		DT_REG_SIZE(RSC_TABLE_NODE)
+
+#define VRING0_NODE		DT_CHOSEN(zephyr_vring0_shm)
+#define VRING0_START_ADDR	DT_REG_ADDR(VRING0_NODE)
+#define VRING0_SIZE		DT_REG_SIZE(VRING0_NODE)
+
 
 #define NUM_VRINGS 0x02
 
@@ -59,8 +80,10 @@ const struct remote_resource_table resources = {
     },
 
     /* Vring rsc entry - part of vdev rsc entry */
-    {VDEV0_VRING_BASE, VRING_ALIGN, RL_BUFFER_COUNT, 0, 0},
-    {VDEV0_VRING_BASE + VRING_SIZE, VRING_ALIGN, RL_BUFFER_COUNT, 1, 0},
+    {VRING0_START_ADDR, VRING_ALIGN, RL_BUFFER_COUNT, 0, 0},
+    {VRING0_START_ADDR + VRING0_SIZE, VRING_ALIGN, RL_BUFFER_COUNT, 1, 0},
+/*    {VDEV0_VRING_BASE, VRING_ALIGN, RL_BUFFER_COUNT, 0, 0},
+    {VDEV0_VRING_BASE + VRING_SIZE, VRING_ALIGN, RL_BUFFER_COUNT, 1, 0}, */
 };
 
 void copyResourceTable(void)
@@ -70,6 +93,7 @@ void copyResourceTable(void)
      * VDEV0_VRING_BASE is temperorily kept for backward compatibility, will be
      * removed in future release
      */
-    memcpy((void *)VDEV0_VRING_BASE, &resources, sizeof(resources));
-    memcpy((void *)(VDEV0_VRING_BASE + RESOURCE_TABLE_OFFSET), &resources, sizeof(resources));
+    memcpy((void *)RSC_TABLE_START_ADDR, &resources, sizeof(resources));
+/*    memcpy((void *)VDEV0_VRING_BASE, &resources, sizeof(resources));
+    memcpy((void *)(VDEV0_VRING_BASE + RESOURCE_TABLE_OFFSET), &resources, sizeof(resources)); */
 }
