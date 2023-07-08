@@ -249,16 +249,17 @@ void app_task(void *arg1, void *arg2, void *arg3)
 
 		if( (len==1) && ((app_buf[0] == 0xa) || (app_buf[0] == 0xd)) )
 		{
-			printk("\r\n");
+			app_buf[0] = '\r';
+			app_buf[1] = '\n';
+			app_buf[2] = '\0';
 		}
 		else if ((len == 2) && (app_buf[0] == 0xd) && (app_buf[1] == 0xa))
 		{
-			printk("\r\n");
+			app_buf[0] = '\r';
+			app_buf[1] = '\n';
+			app_buf[2] = '\0';
 		}
-		else
-		{
-			printk("%s", app_buf);
-		}
+		printk("%s", app_buf);
 
         /* Get tx buffer from RPMsg */
         tx_buf = rpmsg_lite_alloc_tx_buffer(my_rpmsg, &size, RL_BLOCK);

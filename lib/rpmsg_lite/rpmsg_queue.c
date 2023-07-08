@@ -71,7 +71,7 @@ rpmsg_queue_handle rpmsg_queue_create(struct rpmsg_lite_instance *rpmsg_lite_dev
         return RL_NULL;
     }
 
-    printk("rpmsg_queue_create: rpmsg_lite_dev->rvq->vq_nentries=%d\r\n", rpmsg_lite_dev->rvq->vq_nentries);
+  /*  printk("rpmsg_queue_create: rpmsg_lite_dev->rvq->vq_nentries=%d\r\n", rpmsg_lite_dev->rvq->vq_nentries); */
 
     /* create message queue for channel default endpoint */
 #if defined(RL_USE_STATIC_API) && (RL_USE_STATIC_API == 1)
