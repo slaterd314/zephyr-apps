@@ -67,6 +67,8 @@ static volatile rpmsg_queue_handle my_queue        = NULL;
 static uint8_t queue_storage[256*sizeof(rpmsg_queue_rx_cb_data_t)];
 #endif
 
+
+#if 0
 static void dumpVirtqueue(const char *name, struct virtqueue *vq)
 {
 #if 0
@@ -94,6 +96,7 @@ static void dumpVirtqueue(const char *name, struct virtqueue *vq)
 #endif
 }
 
+
 static void dump_rpmsg_lite_instance(struct rpmsg_lite_instance *rpmsg)
 {
 #if 1
@@ -114,6 +117,8 @@ static void dump_rpmsg_lite_instance(struct rpmsg_lite_instance *rpmsg)
 	((void)rpmsg);
 #endif
 }
+
+#endif
 
 void app_task(void *arg1, void *arg2, void *arg3)
 {
@@ -161,29 +166,18 @@ void app_task(void *arg1, void *arg2, void *arg3)
 		return;
 	}
 
-	dump_rpmsg_lite_instance(my_rpmsg);
-
 	if(my_rpmsg->rvq == RL_NULL)
 	{
 		printk("rvq is NULL.\n");
 		return;
 	}
 
-	dumpVirtqueue("rvq", my_rpmsg->rvq);
-	
+
 	if(my_rpmsg->tvq == RL_NULL)
 	{
 		printk("tvq is NULL.\n");
 		return;
 	}
-
-	dumpVirtqueue("tvq", my_rpmsg->tvq);
-/*
-	if(device_get_binding(DT_N_S_soc_S_mailbox_30ab0000_FULL_NAME))
-	{
-		my_rpmsg->link_state = 1;
-	}
-*/
 	printk("rpmsg_lite_wait_for_link_up. linkstate addr: %p\n", &(my_rpmsg->link_state));
 	/* uint32_t test = RL_SUCCESS; */ /* rpmsg_lite_wait_for_link_up(my_rpmsg, RL_BLOCK); */
 	uint32_t test = rpmsg_lite_wait_for_link_up(my_rpmsg, RL_BLOCK);
@@ -192,7 +186,6 @@ void app_task(void *arg1, void *arg2, void *arg3)
 		printk("rpmsg_lite_wait_for_link_up failed.\n");
 		return;
 	}
-
 
 
 #if defined(RL_USE_STATIC_API) && (RL_USE_STATIC_API == 1)
@@ -243,13 +236,16 @@ void app_task(void *arg1, void *arg2, void *arg3)
         assert(len < sizeof(app_buf));
         memcpy(app_buf, rx_buf, len);
         app_buf[len] = 0; /* End string by '\0' */
-		printk("%s", app_buf);
-/*
-        if ((len == 2) && (app_buf[0] == 0xd) && (app_buf[1] == 0xa))
-            printk("Get New Line From Master Side\r\n");
-        else
-            printk("Get Message From Master Side : \"%s\" [len : %d]\r\n", app_buf, len);
-*/
+		
+		if ((len == 2) && (app_buf[0] == 0xd) && (app_buf[1] == 0xa))
+		{
+			printk("\r\n");
+		}
+		else
+		{
+			printk("%s", app_buf);
+		}
+
         /* Get tx buffer from RPMsg */
         tx_buf = rpmsg_lite_alloc_tx_buffer(my_rpmsg, &size, RL_BLOCK);
         assert(tx_buf);
@@ -273,7 +269,6 @@ void app_task(void *arg1, void *arg2, void *arg3)
 
 }
 
-
 static struct k_thread thread_rp__client_data;
 K_THREAD_STACK_DEFINE(thread_rp__client_stack, APP_TASK_STACK_SIZE);
 
@@ -283,37 +278,12 @@ static k_tid_t runRpmsgList();
 
 int main(void)
 {
-
-/*	my_debug_out("main()\n"); */
-
-	/* k_sleep(K_MSEC(1000));  */
-
-#if 0
-	const struct device *mu = DEVICE_DT_GET(DT_DRV_INST(0));
-	bool isready = device_is_ready(mu);
-
-	printk("mu is ready: %d\n", isready);
-	printk("mu addr: %p\n", mu);
-	printk("mu->name: %s\n", mu->name);
-	printk("mu->config: %p\n", mu->config);
-	printk("mu->api: %p\n", mu->api);
-	printk("mu->state: %p\n", mu->state);
-	printk("mu->data: %p\n", mu->data);
-
-	if(mu->state)
+	k_tid_t tId = runRpmsgList();
+	if(NULL == tId)
 	{
-		printk("mu->state->init_res: %d\n", mu->state->init_res);
-		printk("mu->state->initialized: %d\n", mu->state->initialized);
+		printk("runRpmsgList failed.\n");
+		return -1;
 	}
-#endif // 0
-
-	/* k_sleep(K_MSEC(5000));
-	app_task(NULL,NULL,NULL); */
-
-	k_thread_create(&thread_rp__client_data, thread_rp__client_stack, APP_TASK_STACK_SIZE,
-			(k_thread_entry_t)app_task,
-			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
-			
 	return 0;
 }
 
