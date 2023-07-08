@@ -1,0 +1,9 @@
+# MIMX8MM EVK board
+
+# Copyright (c) 2023, Teledatics, Inc.
+# SPDX-License-Identifier: All rights reserved
+
+config BOARD_TELEDATICS_IMX8MM
+	bool "Teledatics imx8mm Halo Board"
+	depends on SOC_SERIES_IMX8MM_M4
+	select SOC_PART_NUMBER_MIMX8MM6DVTLZ

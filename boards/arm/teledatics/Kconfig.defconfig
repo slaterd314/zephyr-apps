@@ -1,0 +1,19 @@
+# Teledatics Kimchi Halo Board
+
+# Copyright (c) 2023, Teledatics, Inc.
+# 
+# SPDX-License-Identifier: All rights reserved.
+
+if BOARD_TELEDATICS_KIMCHI
+
+config BOARD
+	default "teledatics_imx8mm"
+
+if !XIP
+config FLASH_SIZE
+	default 0
+config FLASH_BASE_ADDRESS
+	default 0
+endif
+
+endif # BOARD_TELEDATICS_KIMCHI

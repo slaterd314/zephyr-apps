@@ -13,3 +13,11 @@ endmenu
 module = APP
 module-str = APP
 source "subsys/logging/Kconfig.template.log_config"
+
+
+# config RPMSG_LITE_RSC_TABLE
+# 	bool "coprocessor resource table"
+#    depends on OPENAMP_RSC_TABLE
+# 	help
+# 	  add the resource table in the generated binary. This table is
+# 	  compatible with linux remote proc framework and rpmsh-lite library.

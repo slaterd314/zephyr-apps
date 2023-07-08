@@ -8,6 +8,8 @@ manifest:
   remotes:
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
+    - name: nxp-mcuxpresso
+      url-base: https://github.com/nxp-mcuxpresso
 
   projects:
     - name: zephyr
@@ -18,5 +20,17 @@ manifest:
         # strictly needed by the application.
         name-allowlist:
           - cmsis      # required by the ARM port
-          - hal_nordic # required by the custom_plank board (Nordic based)
-          - hal_stm32  # required by the nucleo_f302r8 board (STM32 based)
+          - hal_nxp   # required by the custom_plank board (Nordic based)
+          - libmetal  # required by the nucleo_f302r8 board (STM32 based)
+          - open-amp
+          - hal_nordic
+          - hal_stm32
+    - name: rpmsg-lite
+      remote: nxp-mcuxpresso
+      revision: master
+      path: rpmsg-lite
+    - name: mcux-sdk-examples
+      remote: nxp-mcuxpresso
+      revision: main
+      path: mcux-sdk-examples
+
